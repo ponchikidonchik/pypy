@@ -1,0 +1,115 @@
+создаем класс с название BD.cs
+в котором:
+
+
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace tests.Class
+{
+    public class DB
+    {
+        public string StringCon()
+        {
+            return @"Data Source=DESKTOP-KL5UG8H\SQLEXPRESS;Initial Catalog=test;Integrated Security=True";
+        }
+        public SqlDataAdapter queryExecute(string query)
+        {
+            try
+            {
+                SqlConnection myCon = new SqlConnection(StringCon());
+                myCon.Open();
+
+                SqlDataAdapter SDA = new SqlDataAdapter(query, myCon);
+
+                SDA.SelectCommand.ExecuteNonQuery();
+                MessageBox.Show("Действие успешно выполнено!", "Успех");
+                return SDA;
+            }
+            catch
+            {
+                MessageBox.Show("Возникла ошибка при выполнении запроса.", "Ошибка");
+                return null;
+            }
+        }
+
+
+    }
+}
+
+DESKTOP-KL5UG8H\SQLEXPRESS   -- название сервака
+test -- название таблицы
+
+
+код для перехода между старниц:
+private void названиекнопки_Click(object sender, EventArgs e)
+{
+    this.Hide();
+    НазваниеФормыНаКоторуюНадоПерейти f2 = new НазваниеФормыНаКоторуюНадоПерейти();
+    f2.ShowDialog();
+}
+
+код для формы изменений:
+
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using tests.Class;
+using System.Data.SqlClient;
+
+namespace tests
+{
+    public partial class Изменить : Form
+    {
+        private DB db;
+        public Изменить()
+        {
+            db = new DB();
+            InitializeComponent();
+        }
+	--- для добавления новых строк, нужно добавить необходимое количество текстбоксов и поменять названия атрибутов, а ну и название таблицы 
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            var queryAddParners = $"insert into Partners (FIO, Deatelnoct, Prodagi, Reiting, Address, Phone, Email) values ('{textBox1.Text}', '{textBox2.Text}', {textBox3.Text}, {textBox4.Text}, '{textBox5.Text}', '{textBox6.Text}', '{textBox7.Text}')";
+            db.queryExecute(queryAddParners);
+        }
+
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            FormPartners f2 = new FormPartners();
+            f2.ShowDialog();
+        }
+	---для удаления строк по айди, добавить 1 текстбокс и кнопочку, поменять название таблицы и возможно номер текст бокса
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            var queryDeletePartners = $"delete Partners where partnerID = {textBox8.Text}";
+            db.queryExecute(queryDeletePartners);
+        }
+
+---для редактирования строк по айди, добавить 2 текстбокса и кнопочку, поменять название таблицы и возможно номер текст бокса, а также название атрибута
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            var queryUpdatePartners = $"update Partners set FIO = '{textBox10.Text}' where partnerID = {textBox9.Text}";
+            db.queryExecute(queryUpdatePartners);
+        }
+
+
+    }
+}
+
