@@ -1,0 +1,122 @@
+CREATE TABLE material_types (
+    material_type_id INT PRIMARY KEY IDENTITY(1,1),
+    type_name NVARCHAR(50) NOT NULL,
+    loss_percentage DECIMAL(5,4) NOT NULL
+);
+
+-- Материалы
+CREATE TABLE materials (
+    material_id INT PRIMARY KEY IDENTITY(1,1),
+    material_name NVARCHAR(100) NOT NULL,
+    material_type_id INT NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    current_quantity INT NOT NULL,
+    min_quantity INT NOT NULL,
+    package_quantity DECIMAL(10,2),
+    unit_of_measure NVARCHAR(20),
+    FOREIGN KEY (material_type_id) REFERENCES material_types(material_type_id)
+);
+
+-- Типы продукции
+CREATE TABLE product_types (
+    product_type_id INT PRIMARY KEY IDENTITY(1,1),
+    type_name NVARCHAR(50) NOT NULL,
+    production_coefficient DECIMAL(5,2) NOT NULL
+);
+
+-- Продукция
+CREATE TABLE products (
+    product_id INT PRIMARY KEY IDENTITY(1,1),
+    product_name NVARCHAR(100) NOT NULL,
+    product_type_id INT NOT NULL,
+    article_number NVARCHAR(20) NOT NULL,
+    min_partner_price DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (product_type_id) REFERENCES product_types(product_type_id)
+);
+
+-- Связь материалов и продукции
+CREATE TABLE material_products (
+    material_id INT NOT NULL,
+    product_id INT NOT NULL,
+    required_quantity DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (material_id, product_id),
+    FOREIGN KEY (material_id) REFERENCES materials(material_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+-- Типы материалов (Material_type_import.xlsx)
+SET IDENTITY_INSERT material_types ON;
+INSERT INTO material_types (material_type_id, type_name, loss_percentage) VALUES
+(1, 'Дерево', 0.0055),
+(2, 'Древесная плита', 0.0030),
+(3, 'Текстиль', 0.0015),
+(4, 'Стекло', 0.0045),
+(5, 'Металл', 0.0010),
+(6, 'Пластик', 0.0005);
+SET IDENTITY_INSERT material_types OFF;
+
+-- Типы продукции (Product_type_import.xlsx)
+SET IDENTITY_INSERT product_types ON;
+INSERT INTO product_types (product_type_id, type_name, production_coefficient) VALUES
+(1, 'Кресла', 1.95),
+(2, 'Полки', 2.50),
+(3, 'Стеллажи', 4.35),
+(4, 'Столы', 5.50),
+(5, 'Тумбы', 7.60),
+(6, 'Шкафы', 6.72);
+SET IDENTITY_INSERT product_types OFF;
+
+-- Материалы (Materials_import.xlsx - все записи)
+INSERT INTO materials (material_name, material_type_id, unit_price, current_quantity, min_quantity, package_quantity, unit_of_measure) VALUES
+('Цельный массив дерева Дуб 1000х600 мм', 1, 7450.00, 1500, 500, 7.20, 'м²'),
+('Клееный массив дерева Дуб 1000х600 мм', 1, 4520.00, 300, 500, 7.20, 'м²'),
+('Шпон облицовочный Дуб натуральный 2750х480 мм', 1, 2500.00, 2000, 1500, 19.80, 'м²'),
+('Фанера 2200х1000 мм', 2, 2245.00, 450, 1000, 52.80, 'м²'),
+('ДСП 2750х1830 мм', 2, 529.60, 1010, 1200, 181.08, 'м²'),
+('МДФ 2070х1400 мм', 2, 417.24, 1550, 1000, 87.00, 'м²'),
+('ДВП 2440х2050 мм', 2, 187.00, 1310, 1000, 190.00, 'м²'),
+('ХДФ 2800x2070 мм', 2, 370.96, 1400, 1200, 90.00, 'м²'),
+('Экокожа 140 см', 3, 1600.00, 1200, 1500, 100.00, 'пог.м'),
+('Велюр 140 см', 3, 1300.00, 1300, 1500, 100.00, 'пог.м'),
+('Шенилл 140 см', 3, 620.00, 950, 1500, 100.00, 'пог.м'),
+('Рогожка 140 см', 3, 720.00, 960, 1500, 100.00, 'пог.м'),
+('Закаленное стекло 2600х1800 мм', 4, 1148.00, 1000, 500, 196.56, 'м²'),
+('Металлокаркас для стула', 5, 1100.00, 300, 250, 5.00, 'шт'),
+('Металлокаркас каркас из профиля с траверсами для стола', 5, 6700.00, 100, 100, 1.00, 'шт'),
+('Колесо для мебели поворотное', 6, 10.59, 1500, 1000, 500.00, 'шт'),
+('Газ-лифт', 5, 730.00, 500, 250, 5.00, 'шт'),
+('Металлическая крестовина для офисных кресел', 5, 2700.00, 500, 250, 5.00, 'шт'),
+('Пластиковый комплект для стула', 6, 900.00, 300, 250, 100.00, 'шт'),
+('Кромка ПВХ', 6, 35.80, 1500, 1000, 100.00, 'м');
+
+-- Продукция (Products_import.xlsx - все записи)
+SET IDENTITY_INSERT products ON;
+INSERT INTO products (product_id, product_name, product_type_id, article_number, min_partner_price) VALUES
+(1, 'Кресло детское цвет Белый и Розовый', 1, '3028272', 15324.99),
+(2, 'Кресло офисное цвет Черный', 1, '3018556', 21443.99),
+(3, 'Кресло эргономичное цвет Темно-коричневый', 1, '3549922', 24760.00),
+(4, 'Полка настольная', 2, '7028048', 2670.89),
+(5, 'Стеллаж для документов цвет Дуб светлый 854х445х2105 мм', 3, '5759324', 24899.00),
+(6, 'Стеллаж цвет Белый с ящиками 854х445х2105 мм', 3, '5259474', 16150.00),
+(7, 'Стеллаж цвет Орех 400х370х2000 мм', 3, '5118827', 2860.00),
+(8, 'Стол для ноутбука на металлокаркасе 800х600х123 мм', 4, '1029784', 14690.00),
+(9, 'Стол компьютерный 700х600х500 мм', 4, '1028248', 4105.89),
+(10, 'Стол компьютерный на металлокаркасе 1400х600х750 мм', 4, '1130981', 13899.00),
+(11, 'Стол письменный 1100x750x600 мм', 4, '1188827', 5148.00),
+(12, 'Стол письменный с тумбочкой 4 ящика 1100x750x600 мм', 4, '1029272', 15325.00),
+(13, 'Стол руководителя письменный цвет Венге 1600x800x764 мм', 4, '1016662', 43500.90),
+(14, 'Стол руководителя письменный цвет Орех темный 2300x1000x750 мм', 4, '1658953', 132500.00),
+(15, 'Тумба выкатная 3 ящика', 5, '6033136', 3750.00),
+(16, 'Тумба офисная для оргтехники', 5, '6115947', 2450.00),
+(17, 'Узкий пенал стеллаж 5 полок цвет Орех 364х326x2000 мм', 3, '5559898', 8348.00),
+(18, 'Шкаф для книг 800x420x2000 мм', 6, '4159043', 23390.99),
+(19, 'Шкаф для одежды цвет Венге 602x420x2000 мм', 6, '4758375', 12035.00),
+(20, 'Шкаф-витрина 2 ящика 800x420x2000 мм', 6, '4588376', 31991.00);
+SET IDENTITY_INSERT products OFF;
+
+-- Связи материалы-продукция (Material_products__import.xlsx - первые 20 записей для примера)
+INSERT INTO material_products (material_id, product_id, required_quantity) VALUES
+(4, 1, 0.85), (10, 1, 1.50), (11, 1, 1.50), (12, 1, 1.50), (14, 1, 1.00),
+(15, 1, 5.00), (16, 1, 1.00), (17, 1, 1.00), (19, 1, 1.00), (4, 2, 1.25),
+(9, 2, 3.04), (11, 2, 1.50), (12, 2, 2.50), (14, 2, 1.00), (15, 2, 5.00),
+(16, 2, 1.00), (17, 2, 1.00), (19, 2, 1.00), (4, 3, 1.85), (9, 3, 4.22);
